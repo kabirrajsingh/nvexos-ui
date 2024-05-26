@@ -8,6 +8,7 @@ function App() {
   const [categories, setCategories] = useState({});
   const [products, setProducts] = useState({});
   const [suggestedProducts, setSuggestedProducts] = useState([]);
+  const [thefts, setThefts] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -23,6 +24,11 @@ function App() {
         processSuggestedProducts(data);
       })
       .catch(error => console.error('Error fetching products:', error));
+
+    fetch('/theft.json')
+      .then(response => response.json())
+      .then(data => setThefts(data["Fish Section"])) // Adjust this based on the actual structure of your JSON file
+      .catch(error => console.error('Error fetching thefts:', error));
   }, []);
 
   const processSuggestedProducts = (data) => {
@@ -87,6 +93,20 @@ function App() {
         <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'} rounded-lg shadow-md p-4`}>
           {suggestedProducts.map((item, index) => (
             <SuggestedProductCard key={index} product={item} darkMode={darkMode} />
+          ))}
+        </div>
+      </section>
+      <section>
+        <h2 className={`text-2xl font-semibold text-center mt-12 mb-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-red-600 text-white'} px-4 py-2 rounded-lg shadow-md`}>
+          Suspected Thefts
+        </h2>
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-red-100 text-black'} rounded-lg shadow-md p-4`}>
+          {thefts.map((theft, index) => (
+            <div key={index} className="bg-white p-4 rounded-lg shadow-lg">
+              <p className="text-lg font-semibold">Time: {theft[1]}</p>
+              <p className="text-lg font-semibold">Product ID: {theft[0]}</p>
+              <p className="text-lg font-semibold">Dwell Time: {theft[2]}</p>
+            </div>
           ))}
         </div>
       </section>
