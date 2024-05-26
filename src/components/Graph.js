@@ -1,29 +1,45 @@
+// Graph.js
 import React from 'react';
-import { Bar } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import 'chart.js/auto';
 
-// Register the necessary components with ChartJS
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+const Graph = ({ data, darkMode }) => {
+  // Adjust styles based on dark mode
+  const chartContainerClass = `w-full md:w-2/3 mx-auto ${darkMode ? 'dark' : ''}`;
+  const notAvailableClass = `bg-gray-200 text-gray-600 p-4 rounded-lg shadow-lg ${darkMode ? 'dark:bg-gray-800 dark:text-white' : ''}`;
 
-const Graph = ({ data }) => {
-  const chartData = {
-    labels: data.categories.map(category => category.category_name),
-    datasets: [
-      {
-        label: 'Dwell Time (seconds)',
-        data: data.categories.map(category => category.dwell_time_seconds),
-        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-      },
-    ],
+  const processChartData = (data) => {
+    const datasets = [];
+    let labels = [];
+    
+    if (Object.keys(data).length === 0) {
+      return null;
+    }
+    
+    for (const product in data) {
+      const values = data[product].map(item => item[0]);
+      labels = data[product].map(item => new Date(item[1]).toLocaleTimeString());
+      datasets.push({
+        label: product,
+        data: values,
+        borderColor: getRandomColor(),
+        fill: false,
+      });
+    }
+
+    return { labels, datasets };
   };
+
+  const getRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  const chartData = processChartData(data);
 
   const options = {
     responsive: true,
@@ -33,14 +49,34 @@ const Graph = ({ data }) => {
       },
       title: {
         display: true,
-        text: 'Category Dwell Time',
+        text: 'Product Dwell Time',
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Time',
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Quantity',
+        },
       },
     },
   };
 
   return (
-    <div className="w-full md:w-2/3 mx-auto">
-      <Bar data={chartData} options={options} />
+    <div className={chartContainerClass}>
+      {chartData ? (
+        <Line data={chartData} options={options} />
+      ) : (
+        <div className={notAvailableClass}>
+          <p className="text-lg">Camera data unavailable</p>
+        </div>
+      )}
     </div>
   );
 };

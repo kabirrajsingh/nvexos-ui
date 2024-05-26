@@ -1,17 +1,23 @@
+// Card.js
 import React from 'react';
 
-const Card = ({ copurchased, frequency }) => {
+const Card = ({ copurchased, darkMode }) => {
+  // Adjust styles based on dark mode
+  const listItemClass = `text-lg ${darkMode ? 'dark:text-white' : ''}`;
+
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 m-4 w-72">
-      
-      <ul className="list-disc list-inside mb-4">
-        {copurchased.map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
-      <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
-        {frequency} times
-      </span>
+    <div className="bg-white p-4 rounded-lg shadow-lg">
+      {copurchased.length > 0 ? (
+        <ul className="list-disc pl-5 space-y-1">
+          {copurchased.map((item, index) => (
+            <li key={index} className={listItemClass}>{item}</li>
+          ))}
+        </ul>
+      ) : (
+        <div className={`text-gray-600 ${darkMode ? 'dark:text-gray-400' : ''}`}>
+          No co-purchased items available
+        </div>
+      )}
     </div>
   );
 };

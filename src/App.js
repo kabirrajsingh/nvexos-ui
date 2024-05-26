@@ -1,50 +1,101 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Graph from './components/Graph';
 import Card from './components/Card';
+import SuggestedProductCard from './components/SuggestedProductCard';
 import './App.css';
 
-const data = {
-  categories: [
-    { category_id: 1, category_name: 'Electronics', dwell_time_seconds: 1245 },
-    { category_id: 2, category_name: 'Clothing', dwell_time_seconds: 987 },
-    { category_id: 3, category_name: 'Home & Kitchen', dwell_time_seconds: 654 },
-    { category_id: 4, category_name: 'Books', dwell_time_seconds: 0 },
-    { category_id: 5, category_name: 'Toys & Games', dwell_time_seconds: 432 },
-    { category_id: 6, category_name: 'Health & Beauty', dwell_time_seconds: 1098 },
-    { category_id: 7, category_name: 'Sports & Outdoors', dwell_time_seconds: 567 },
-    { category_id: 8, category_name: 'Automotive', dwell_time_seconds: 0 },
-    { category_id: 9, category_name: 'Grocery', dwell_time_seconds: 375 },
-    { category_id: 10, category_name: 'Pet Supplies', dwell_time_seconds: 810 },
-  ],
-  co_purchased_categories: [
-    { copurchased: ['Electronics', 'Accessories'], frequency: 9 },
-    { copurchased: ['Clothing', 'Shoes'], frequency: 10 },
-    { copurchased: ['Home & Kitchen', 'Furniture'], frequency: 6 },
-    { copurchased: ['Books', 'Stationery'], frequency: 4 },
-    { copurchased: ["Toys & Games", "Children's Books"], frequency: 8 },
-    { copurchased: ['Health & Beauty', 'Personal Care'], frequency: 7 },
-    { copurchased: ['Sports & Outdoors', 'Fitness Equipment'], frequency: 5 },
-    { copurchased: ['Automotive', 'Tools & Equipment'], frequency: 3 },
-    { copurchased: ['Grocery', 'Household Supplies'], frequency: 10 },
-    { copurchased: ['Pet Supplies', 'Pet Food'], frequency: 6 },
-  ],
-};
-
 function App() {
+  const [categories, setCategories] = useState({});
+  const [products, setProducts] = useState({});
+  const [suggestedProducts, setSuggestedProducts] = useState([]);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    fetch('/categories.json')
+      .then(response => response.json())
+      .then(data => setCategories(data))
+      .catch(error => console.error('Error fetching categories:', error));
+
+    fetch('/products.json')
+      .then(response => response.json())
+      .then(data => {
+        setProducts(data);
+        processSuggestedProducts(data);
+      })
+      .catch(error => console.error('Error fetching products:', error));
+  }, []);
+
+  const processSuggestedProducts = (data) => {
+    const result = [];
+    for (const section in data) {
+      for (const product in data[section]) {
+        result.push({
+          section,
+          product,
+          data: data[section][product]
+        });
+      }
+    }
+    setSuggestedProducts(result);
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode(prevMode => !prevMode);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-4xl font-bold text-center mt-8 mb-8 bg-green-100 text-green-800 px-6 py-4 rounded-lg shadow-lg">
-        Category Dwell Time & Co-Purchases
-      </h1>
-      <Graph data={data} />
-      <h2 className="text-2xl font-semibold text-center mt-12 mb-6 bg-blue-100 text-blue-800 px-4 py-2 rounded-lg shadow-md">
-        Co-Purchased Categories
-      </h2>
-      <div className="flex flex-wrap justify-center">
-        {data.co_purchased_categories.map((item, index) => (
-          <Card key={index} copurchased={item.copurchased} frequency={item.frequency} />
+    <div className={`min-h-screen p-8 ${darkMode ? 'dark' : ''}`}>
+      <header>
+        <h1 className={`text-4xl font-bold text-center mt-8 mb-8 ${darkMode ? 'text-white' : 'text-black'}`}>
+          ShopkAIper
+        </h1>
+      </header>
+      <main className="space-y-8">
+        {Object.keys(products).map((section, index) => (
+          <section key={index}>
+            <h2 className={`text-2xl font-semibold text-center mt-12 mb-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-blue-100 text-blue-800'} px-4 py-2 rounded-lg shadow-md`}>
+              {section} Dwell Time
+            </h2>
+            <Graph data={products[section]} darkMode={darkMode} />
+          </section>
         ))}
-      </div>
+      </main>
+      <section>
+        <h2 className={`text-2xl font-semibold text-center mt-12 mb-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-blue-100 text-blue-800'} px-4 py-2 rounded-lg shadow-md`}>
+          Co-Purchased Categories
+        </h2>
+        <div className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'} rounded-lg shadow-md p-4`}>
+          {Object.keys(categories).map((section, index) => (
+            // Only render the category if it has co-purchased products
+            categories[section].length > 0 && (
+              <div key={index} className="mb-6">
+                <h3 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>{section}</h3>
+                <div className="grid grid-cols-1 gap-4">
+                  {categories[section].map((pair, idx) => (
+                    <Card key={idx} copurchased={pair} darkMode={darkMode} />
+                  ))}
+                </div>
+              </div>
+            )
+          ))}
+        </div>
+      </section>
+      <section>
+        <h2 className={`text-2xl font-semibold text-center mt-12 mb-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-purple-100 text-purple-800'} px-4 py-2 rounded-lg shadow-md`}>
+          Suggested Products
+        </h2>
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'} rounded-lg shadow-md p-4`}>
+          {suggestedProducts.map((item, index) => (
+            <SuggestedProductCard key={index} product={item} darkMode={darkMode} />
+          ))}
+        </div>
+      </section>
+      <button
+        className={`fixed bottom-4 right-4 px-4 py-2 rounded-md ${darkMode ? 'bg-white text-black' : 'bg-gray-800 text-white'}`}
+        onClick={toggleDarkMode}
+      >
+        {darkMode ? 'Light Mode' : 'Dark Mode'}
+      </button>
     </div>
   );
 }
