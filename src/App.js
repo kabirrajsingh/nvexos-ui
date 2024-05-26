@@ -60,7 +60,7 @@ function App() {
         {Object.keys(products).map((section, index) => (
           <section key={index}>
             <h2 className={`text-2xl font-semibold text-center mt-12 mb-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-blue-100 text-blue-800'} px-4 py-2 rounded-lg shadow-md`}>
-              {section} Dwell Time
+              {section} Dwell Time for 26-05-2024
             </h2>
             <Graph data={products[section]} darkMode={darkMode} />
           </section>
@@ -70,7 +70,7 @@ function App() {
         <h2 className={`text-2xl font-semibold text-center mt-12 mb-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-blue-100 text-blue-800'} px-4 py-2 rounded-lg shadow-md`}>
           Co-Purchased Categories
         </h2>
-        <div className={`grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'} rounded-lg shadow-md p-4`}>
+        <div className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'} rounded-lg shadow-md p-4`}>
           {Object.keys(categories).map((section, index) => (
             // Only render the category if it has co-purchased products
             categories[section].length > 0 && (
@@ -104,8 +104,8 @@ function App() {
           {thefts.map((theft, index) => (
             <div key={index} className="bg-white p-4 rounded-lg shadow-lg">
               <p className="text-lg font-semibold">Time: {theft[1]}</p>
-              <p className="text-lg font-semibold">Product ID: {theft[0]}</p>
-              <p className="text-lg font-semibold">Dwell Time: {theft[2]}</p>
+              <p className="text-lg font-semibold">Level Of Interaction: {theft[0]}</p>
+              <p className="text-lg font-semibold">Z-Score {theft[2]}</p>
             </div>
           ))}
         </div>

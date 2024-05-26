@@ -11,7 +11,7 @@ const SuggestedProductCard = ({ product, darkMode }) => {
   const cumulativeSum = data.reduce((acc, entry) => {
     const timestamp = new Date(entry[1]);
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    if (timestamp > oneHourAgo) {
+    if (true) {
       acc += entry[0];
     }
     return acc;
@@ -21,14 +21,14 @@ const SuggestedProductCard = ({ product, darkMode }) => {
     <div className={containerClass}>
       <h3 className="text-xl font-semibold mb-4">{section} - {productName}</h3>
       <p className="text-lg font-medium mb-2">Products sold recently: {cumulativeSum}</p>
-      <ul className="list-disc pl-5 space-y-1">
+      {/* <ul className="list-disc pl-5 space-y-1">
         {data.filter(entry => entry[0] !== 0).map((entry, index) => (
           <li key={index} className={listItemClass}>
             <span className="font-medium">Quantity: </span>{entry[0]}{' '}
             <span className="font-medium">Date: </span>{new Date(entry[1]).toLocaleString()}
           </li>
         ))}
-      </ul>
+      </ul> */}
     </div>
   );
 };
